@@ -3,12 +3,21 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import './styles.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../../utils/requet';
+import { Sale } from '../../models/sale';
 
 function SalesCard() {
 
     const [minDate, setMinDate] = useState(new Date());
     const [maxDate, setMaxDate] = useState(new Date());
+
+    const [sales, setSales] = useState<Sale[]>([]);
+
+    useEffect(() => {
+        axios.get(`${BASE_URL}/sales`).then(response => { setSales(response.data.content) });
+    }, []);
 
     return (
         <div className="dsmeta-card">
@@ -46,45 +55,23 @@ function SalesCard() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td className="dsmeta-show-id">#341</td>
-                            <td className="dsmeta-show-date">08/07/2022</td>
-                            <td>Anakin</td>
-                            <td className="dsmeta-show-visitas">15</td>
-                            <td className="dsmeta-show-vendas">11</td>
-                            <td>R$ 55.300,00</td>
-                            <td>
-                                <div className="dsmeta-notification-btn-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="dsmeta-show-id">#341</td>
-                            <td className="dsmeta-show-date">08/07/2022</td>
-                            <td>Anakin</td>
-                            <td className="dsmeta-show-visitas">15</td>
-                            <td className="dsmeta-show-vendas">11</td>
-                            <td>R$ 55.300,00</td>
-                            <td>
-                                <div className="dsmeta-notification-btn-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="dsmeta-show-id">#341</td>
-                            <td className="dsmeta-show-date">08/07/2022</td>
-                            <td>Anakin</td>
-                            <td className="dsmeta-show-visitas">15</td>
-                            <td className="dsmeta-show-vendas">11</td>
-                            <td>R$ 55.300,00</td>
-                            <td>
-                                <div className="dsmeta-notification-btn-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
+                        {sales.map(sale => {
+                            return (
+                                <tr key={sale.id}>
+                                    <td className="dsmeta-show-id">{sale.id}</td>
+                                    <td className="dsmeta-show-date">{new Date(sale.date).toLocaleDateString()}</td>
+                                    <td>{sale.sellerName}</td>
+                                    <td className="dsmeta-show-visitas">{sale.visited}</td>
+                                    <td className="dsmeta-show-vendas">{sale.deals}</td>
+                                    <td>R$ {sale.amount.toFixed(2)}</td>
+                                    <td>
+                                        <div className="dsmeta-notification-btn-container">
+                                            <NotificationButton />
+                                        </div>
+                                    </td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
             </div>
