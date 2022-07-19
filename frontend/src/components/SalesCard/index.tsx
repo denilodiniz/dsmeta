@@ -10,14 +10,24 @@ import { Sale } from '../../models/sale';
 
 function SalesCard() {
 
-    const [minDate, setMinDate] = useState(new Date());
-    const [maxDate, setMaxDate] = useState(new Date());
+    const min = new Date(new Date().setDate(new Date().getDate() - 365));
+    const max = new Date();
+
+    const [minDate, setMinDate] = useState(new Date(min));
+    const [maxDate, setMaxDate] = useState(new Date(max));
 
     const [sales, setSales] = useState<Sale[]>([]);
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/sales`).then(response => { setSales(response.data.content) });
-    }, []);
+
+        const dmin = minDate.toISOString().slice(0, 10); //recorda do primeiro caractere até o 10º
+        const dmax = maxDate.toISOString().slice(0, 10); //recorda do primeiro caractere até o 10º
+
+        axios.get(`${BASE_URL}/sales?minDate=${dmin}&maxDate=${dmax}`)
+            .then(response => {
+                setSales(response.data.content);
+            })
+        }, [minDate, maxDate]);
 
     return (
         <div className="dsmeta-card">
@@ -66,7 +76,7 @@ function SalesCard() {
                                     <td>R$ {sale.amount.toFixed(2)}</td>
                                     <td>
                                         <div className="dsmeta-notification-btn-container">
-                                            <NotificationButton />
+                                            <NotificationButton saleId={sale.id} />
                                         </div>
                                     </td>
                                 </tr>
